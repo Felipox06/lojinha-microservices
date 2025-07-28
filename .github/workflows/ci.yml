@@ -1,0 +1,40 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+
+      steps:
+      - uses: actions/checkout@v3
+
+      - name: Go Setup
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.5"
+          
+      - name: Instalar Dependências
+        run: |
+          go mod init https://github.com/Felipox06/lojinha-microservices
+          go mod tidy
+        working-directory: ./services/user-service
+
+      - name: Format check  # Verifica formatação
+        run: |
+          if [ -n "$(gofmt -l .)" ]; then
+           echo "Go code is not formatted"
+          exit 1
+          fi
+    
+      - name: Run tests  # Executa testes
+        run: go test -v ./...
+        working-directory: ./services/user-service
+    
+      - name: Build  # Compila código
+      run: go build -v ./...
+      working-directory: ./services/user-service
