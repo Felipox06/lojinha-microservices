@@ -1,0 +1,32 @@
+@"
+# Binários Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test e coverage
+*.test
+*.out
+coverage.txt
+coverage.html
+
+# Vendor
+vendor/
+
+# IDEs
+.vscode/
+.idea/
+
+# Env files
+.env
+.env.local
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+"@ | Out-File -FilePath .gitignore -Encoding UTF8
