@@ -127,7 +127,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
 // DeleteUser - DELETE /users/{id}
 func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request){
 	vars := mux.Vars(r)
-	userID = vars["id"]
+	userID := vars["id"]
 
 	if err := h.service.DeleteUser(userID); err != nil{
 		log.Printf("Erro deletando user %s: %v", userID, err)
