@@ -102,7 +102,7 @@ func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request){
 // UpdateUser - PUT /users/{id}
 func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
 	// Primeira etapa: Extrair ID
-	vais := mux.Vars(r)
+	vars := mux.Vars(r)
 	userID := vars["id"]
 
 	// Segunda etapa: Decodificar body
