@@ -34,7 +34,7 @@ func NewUserService() UserService{
 	}
 }
 // CreateUser implementa o método da interface
-func (s *userService) /* instância atual da struct userService */ CreateUser(req models.CreateUserRequest) (models*User, error){
+func (s *userService) CreateUser(req models.CreateUserRequest) (*models.User, error){
 	for _, user := range s.users{
 		if user.Email == req.Email{
 			return nil, errors.New("email já existe")
@@ -70,10 +70,10 @@ func (s *userService) GetUserByEmail(email string) (*models.User, error){
 			return user, nil
 		}
 	}
-	return nil, erros.New("user não encontrado")
+	return nil, errors.New("user não encontrado")
 }
 
-func (s *userService) UpdateUser(id String, req models.CreateUserRequest) (*models.User, error){
+func (s *userService) UpdateUser(id string, req models.CreateUserRequest) (*models.User, error){
 	user, exists := s.users[id]
 	if !exists {
 		return nil, fmt.Errorf("user com id %s não foi encontrado", id)
@@ -116,5 +116,5 @@ func generateID() string{
 
 func hashPassword(password string) string{
 	// TODO: usar bcrypt
-	return fmt.Srpintf("hashed_%s", password)
+	return fmt.Sprintf("hashed_%s", password)
 }
