@@ -29,7 +29,7 @@ func main(){
 	v1.HandleFunc("/health", healthHandler).Methods("GET")
 
 
-	v1.HandleFunc("/users", userHaner.CreateUser).Methods("POST")
+	v1.HandleFunc("/users", userHandler.CreateUser).Methods("POST")
 	v1.HandleFunc("/users", userHandler.ListUsers).Methods("GET")
 	v1.HandleFunc("/users/{id}", userHandler.GetUser).Methods("GET")
 	v1.HandleFunc("/users/{id}", userHandler.UpdateUser).Methods("PUT")
