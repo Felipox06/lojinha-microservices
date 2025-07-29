@@ -23,7 +23,7 @@ func NewUserHandler(service services.UserService) *UserHandler{
 // CreateUser - POST /users
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request){
 	// Primeira etapa: Decodificar JSON do body para struct
-	var req.models.CreateUserRequest
+	var req models.CreateUserRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
 		h.respondWithError(w, http.StatusBadRequest, "Request inválido")
@@ -55,7 +55,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request){
 }
 
 // GetUser - GET /users/{id}
-fun (h *UserHandler) GetUser(w http.ResponseWriter, r*http.Request){
+func (h *UserHandler) GetUser(w http.ResponseWriter, r*http.Request){
 	// Primeira etapa: Extrair ID da URL
 	vars := mux.Vars(r)
 	userID := vars["id"]
