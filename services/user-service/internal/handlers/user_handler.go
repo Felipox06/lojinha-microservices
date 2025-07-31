@@ -1,36 +1,36 @@
 package handlers
 
-import(
+import (
 	"encoding/json"
-    "net/http"
-    "log"
-    
-    "github.com/gorilla/mux"
-    "github.com/Felipox06/lojinha-microservices/services/user-service/internal/models"
-    "github.com/Felipox06/lojinha-microservices/services/user-service/internal/services"
+	"log"
+	"net/http"
+
+	"github.com/Felipox06/lojinha-microservices/services/user-service/internal/models"
+	"github.com/Felipox06/lojinha-microservices/services/user-service/internal/services"
+	"github.com/gorilla/mux"
 )
 
-type UserHandler struct{
+type UserHandler struct {
 	service services.UserService
 }
 
-func NewUserHandler(service services.UserService) *UserHandler{
+func NewUserHandler(service services.UserService) *UserHandler {
 	return &UserHandler{
 		service: service,
 	}
 }
 
 // CreateUser - POST /users
-func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request){
+func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	// Primeira etapa: Decodificar JSON do body para struct
 	var req models.CreateUserRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.respondWithError(w, http.StatusBadRequest, "Request inválido")
 		return
 	}
 	defer r.Body.Close()
-    
+
 	// Segunda etapa: Validar dados básicos
 	if req.Name == "" || req.Email == "" || req.Password == "" {
 		h.respondWithError(w, http.StatusBadRequest, "Campos requisitados faltando")
@@ -39,10 +39,10 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request){
 
 	// Terceira etap: Chamar service layer
 	user, err := h.service.CreateUser(req)
-	if err != nil{
+	if err != nil {
 		log.Printf("Erro criando user: %v", err)
 
-		if err.Error() == "email já existe"{
+		if err.Error() == "email já existe" {
 			h.respondWithError(w, http.StatusConflict, "Email já em uso")
 			return
 		}
@@ -55,12 +55,12 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request){
 }
 
 // GetUser - GET /users/{id}
-func (h *UserHandler) GetUser(w http.ResponseWriter, r*http.Request){
+func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 	// Primeira etapa: Extrair ID da URL
 	vars := mux.Vars(r)
 	userID := vars["id"]
 
-	if userID == ""{
+	if userID == "" {
 		h.respondWithError(w, http.StatusBadRequest, "ID de user é necessário")
 		return
 	}
@@ -78,7 +78,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r*http.Request){
 }
 
 // ListUsers - Get /users
-func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request){
+func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
 	// Primeira etapa: Buscar users
 	users, err := h.service.ListUsers()
 	if err != nil {
@@ -88,7 +88,7 @@ func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request){
 
 	// Segunda etapa: Converter para response(sem senhas)
 	responses := make([]models.UserResponse, 0, len(users))
-	for _, user := range users{
+	for _, user := range users {
 		responses = append(responses, user.ToResponse())
 	}
 
@@ -100,14 +100,14 @@ func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request){
 }
 
 // UpdateUser - PUT /users/{id}
-func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
+func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// Primeira etapa: Extrair ID
 	vars := mux.Vars(r)
 	userID := vars["id"]
 
 	// Segunda etapa: Decodificar body
 	var req models.CreateUserRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil{
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.respondWithError(w, http.StatusBadRequest, "Request inválido")
 		return
 	}
@@ -125,11 +125,11 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request){
 }
 
 // DeleteUser - DELETE /users/{id}
-func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request){
+func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	userID := vars["id"]
 
-	if err := h.service.DeleteUser(userID); err != nil{
+	if err := h.service.DeleteUser(userID); err != nil {
 		log.Printf("Erro deletando user %s: %v", userID, err)
 		h.respondWithError(w, http.StatusNotFound, "User não encontrado")
 		return
@@ -140,16 +140,16 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request){
 
 // Helpers para respostas padronizadas
 func (h *UserHandler) respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(code)
-    
-    if err := json.NewEncoder(w).Encode(payload); err != nil {
-        log.Printf("Erro codificando resposta: %v", err)
-    }
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		log.Printf("Erro codificando resposta: %v", err)
+	}
 }
 
 func (h *UserHandler) respondWithError(w http.ResponseWriter, code int, message string) {
-    h.respondWithJSON(w, code, map[string]string{
-        "erro": message,
-    })
+	h.respondWithJSON(w, code, map[string]string{
+		"erro": message,
+	})
 }

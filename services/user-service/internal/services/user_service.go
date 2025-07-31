@@ -10,7 +10,7 @@ import (
 )
 
 // Interface = conjunto de métodos que um tipo deve implementar
-type UserService interface{
+type UserService interface {
 	CreateUser(req models.CreateUserRequest) (*models.User, error) //Cria um usuário a partir de uma requisição e retorna o usuário criado ou erro
 	GetUserByID(id string) (*models.User, error)
 	GetUserByEmail(email string) (*models.User, error)
@@ -28,35 +28,36 @@ type userService struct {
 
 // Construtor(factoy pattern): cria instâncias sem precisar expor os detalhes de como elas são construídas
 // Retorna interface (dependency inversion)
-func NewUserService() UserService{
+func NewUserService() UserService {
 	return &userService{ //retorna um ponteiro para a instância
 		users: make(map[string]*models.User), //make inicializa o map
 	}
 }
+
 // CreateUser implementa o método da interface
-func (s *userService) CreateUser(req models.CreateUserRequest) (*models.User, error){
-	for _, user := range s.users{
-		if user.Email == req.Email{
+func (s *userService) CreateUser(req models.CreateUserRequest) (*models.User, error) {
+	for _, user := range s.users {
+		if user.Email == req.Email {
 			return nil, errors.New("email já existe")
 		}
 	}
 
 	user := &models.User{
-		ID: generateID(),
-		Name: req.Name,
-		Email: req.Email,
-		Password: hashPassword(req.Password),
-		Type: req.Type,
+		ID:        generateID(),
+		Name:      req.Name,
+		Email:     req.Email,
+		Password:  hashPassword(req.Password),
+		Type:      req.Type,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
 
 	s.users[user.ID] = user
-	
+
 	return user, nil
 }
 
-func (s *userService) GetUserByID(id string) (*models.User, error){
+func (s *userService) GetUserByID(id string) (*models.User, error) {
 	user, exists := s.users[id]
 	if !exists {
 		return nil, fmt.Errorf("user com o id %s não foi encontrado", id)
@@ -64,16 +65,16 @@ func (s *userService) GetUserByID(id string) (*models.User, error){
 	return user, nil
 }
 
-func (s *userService) GetUserByEmail(email string) (*models.User, error){
-	for _, user := range s.users{
-		if user.Email == email{
+func (s *userService) GetUserByEmail(email string) (*models.User, error) {
+	for _, user := range s.users {
+		if user.Email == email {
 			return user, nil
 		}
 	}
 	return nil, errors.New("user não encontrado")
 }
 
-func (s *userService) UpdateUser(id string, req models.CreateUserRequest) (*models.User, error){
+func (s *userService) UpdateUser(id string, req models.CreateUserRequest) (*models.User, error) {
 	user, exists := s.users[id]
 	if !exists {
 		return nil, fmt.Errorf("user com id %s não foi encontrado", id)
@@ -81,7 +82,7 @@ func (s *userService) UpdateUser(id string, req models.CreateUserRequest) (*mode
 
 	user.Name = req.Name
 	user.Email = req.Email
-	if req.Password != ""{
+	if req.Password != "" {
 		user.Password = hashPassword(req.Password)
 	}
 	user.Type = req.Type
@@ -90,8 +91,8 @@ func (s *userService) UpdateUser(id string, req models.CreateUserRequest) (*mode
 	return user, nil
 }
 
-func (s *userService) DeleteUser(id string) error{
-	if _, exists := s.users[id]; !exists{
+func (s *userService) DeleteUser(id string) error {
+	if _, exists := s.users[id]; !exists {
 		return fmt.Errorf("user com id %s não foi encontrado", id)
 	}
 
@@ -99,22 +100,22 @@ func (s *userService) DeleteUser(id string) error{
 	return nil
 }
 
-func (s *userService) ListUsers() ([]*models.User, error){
+func (s *userService) ListUsers() ([]*models.User, error) {
 	users := make([]*models.User, 0, len(s.users))
 
-	for _, user := range s.users{
+	for _, user := range s.users {
 		users = append(users, user)
 	}
 
 	return users, nil
 }
 
-func generateID() string{
+func generateID() string {
 	// TODO: usar UUID real
 	return fmt.Sprintf("user_%d", time.Now().UnixNano())
 }
 
-func hashPassword(password string) string{
+func hashPassword(password string) string {
 	// TODO: usar bcrypt
 	return fmt.Sprintf("hashed_%s", password)
 }

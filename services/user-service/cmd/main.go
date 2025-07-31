@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/Felipox06/lojinha-microservices/services/user-service/internal/handlers"
-    "github.com/Felipox06/lojinha-microservices/services/user-service/internal/services"
+	"github.com/Felipox06/lojinha-microservices/services/user-service/internal/services"
+	"github.com/gorilla/mux"
 )
 
-func main(){
-    // Primeira etapa: inicializar camadas (Dependency Injection)
+func main() {
+	// Primeira etapa: inicializar camadas (Dependency Injection)
 	userService := services.NewUserService()
 	userHandler := handlers.NewUserHandler(userService)
 
@@ -28,7 +28,6 @@ func main(){
 
 	v1.HandleFunc("/health", healthHandler).Methods("GET")
 
-
 	v1.HandleFunc("/users", userHandler.CreateUser).Methods("POST")
 	v1.HandleFunc("/users", userHandler.ListUsers).Methods("GET")
 	v1.HandleFunc("/users/{id}", userHandler.GetUser).Methods("GET")
@@ -37,18 +36,18 @@ func main(){
 
 	// Terceira etapa: Configurar servidor
 	srv := &http.Server{
-		Handler: router,
-		Addr: ":8001",
-		ReadTimeout: 15 * time.Second,
+		Handler:      router,
+		Addr:         ":8001",
+		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
-		IdleTimeout: 60 * time.Second,
+		IdleTimeout:  60 * time.Second,
 	}
 
 	fmt.Println("User Service v1 starting on :8001")
 	log.Fatal(srv.ListenAndServe())
 }
 
-func loggingMiddleware(next http.Handler) http.Handler{
+func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
@@ -66,7 +65,7 @@ func loggingMiddleware(next http.Handler) http.Handler{
 
 // CORS - permite requests do browser
 func corsMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request){
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control_Allow-Headers", "Content-Type, Authorization")
@@ -80,10 +79,10 @@ func corsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request){
+func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"status": "healthy",
+		"status":  "healthy",
 		"service": "user-service",
 		"version": "1.0.0",
 	})
