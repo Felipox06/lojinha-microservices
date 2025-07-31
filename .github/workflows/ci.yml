@@ -6,35 +6,38 @@ on:
   pull_request:
     branches: [main]
 
-  jobs:
-    test:
-      runs-on: ubuntu-latest
+jobs:  # ✅ CORRETO: no mesmo nível que "on"
+  test:
+    runs-on: ubuntu-latest
 
-      steps:
+    steps:
       - uses: actions/checkout@v3
 
       - name: Go Setup
         uses: actions/setup-go@v4
         with:
-          go-version: "1.24.5"
+          go-version: "1.22.5"  # Versão correta do Go
           
       - name: Instalar Dependências
         run: |
-          go mod init https://github.com/Felipox06/lojinha-microservices
+          if [ ! -f go.mod ]; then
+            go mod init github.com/Felipox06/lojinha-microservices
+          fi
           go mod tidy
         working-directory: ./services/user-service
 
-      - name: Format check  # Verifica formatação
+      - name: Format check
         run: |
           if [ -n "$(gofmt -l .)" ]; then
-           echo "Go code is not formatted"
-          exit 1
+            echo "Go code is not formatted"
+            exit 1
           fi
+        working-directory: ./services/user-service
     
-      - name: Run tests  # Executa testes
+      - name: Run tests
         run: go test -v ./...
         working-directory: ./services/user-service
     
-      - name: Build  # Compila código
-      run: go build -v ./...
-      working-directory: ./services/user-service
+      - name: Build
+        run: go build -v ./...
+        working-directory: ./services/user-service
